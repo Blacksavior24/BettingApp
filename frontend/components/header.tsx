@@ -7,7 +7,7 @@ import Link from "next/link"
 import ThemeToggle from "./theme-toggle"
 
 export default function Header() {
-  // const { user, logout } = useAuth()
+  const { user, logout } = useAuth()
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/70 backdrop-blur-md">
@@ -17,7 +17,7 @@ export default function Header() {
           <span className="text-lg">BettingApp</span>
         </Link>
         <section className="flex items-center gap-2 sm:gap-4">
-          {/* {user && (
+          {user && (
             <>
               <Link
                 href="/"
@@ -36,7 +36,7 @@ export default function Header() {
                 <LogOut className="h-5 w-5" />
               </Button>
             </>
-          )} */}
+          )}
           <ThemeToggle />
         </section>
       </nav>
