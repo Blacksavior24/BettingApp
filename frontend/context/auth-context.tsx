@@ -3,8 +3,7 @@
 import { mockBets, mockESportsEvents, mockEvents } from "@/lib/data";
 import { Bet, User } from "@/lib/types";
 import { useRouter } from "next/navigation";
-import { createContext, useState, useContext, type ReactNode, use } from "react";
-
+import { createContext, useState, useContext, type ReactNode } from "react";
 
 interface AuthContextType {
     user: User | null;
@@ -70,7 +69,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     }
 
-    return <AuthContext.Provider value={{ user, bets, login, logout, placeBet}}></AuthContext.Provider>
+    return <AuthContext.Provider value={{ user, bets, login, logout, placeBet}}>{children}</AuthContext.Provider>
 
 }
 
