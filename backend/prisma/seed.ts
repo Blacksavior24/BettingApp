@@ -17,6 +17,18 @@ async function main() {
     });
   }
 
+  let usertwo = await prisma.user.findUnique({ where: { username: 'usuario123' } });
+  if (!usertwo) {
+
+    const hashedPassword = await bcrypt.hash('wardev', 10);
+    usertwo = await prisma.user.create({
+      data: {
+        username: 'usuario123',
+        password: hashedPassword,
+      },
+    });
+  }
+
   const existingEvents = await prisma.sportEvent.count();
 
   if (existingEvents === 0) {
