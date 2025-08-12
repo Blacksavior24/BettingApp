@@ -35,7 +35,11 @@ export class UserService {
       select:{
         id: true,
         username: true,
-        bets: true, // Assuming you want to include bets as well
+        bets: {
+          include: {
+            event: true
+          }
+        }
       }
     });
   }

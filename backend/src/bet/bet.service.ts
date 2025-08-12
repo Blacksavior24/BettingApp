@@ -11,11 +11,27 @@ export class BetService {
   create(createBetDto: CreateBetDto) {
     return this.prisma.bet.create({
       data: createBetDto,
+      include: {
+        user: true,
+        event: true,
+      },
     });
   }
 
   findAll() {
-    return this.prisma.bet.findMany();
+    return this.prisma.bet.findMany({
+      select: {
+        id: true,
+        userId: true,
+        eventId: true,
+        selectedOutcome: true,
+        amount: true,
+        potentialWinnings: true,
+        status: true,
+        date: true,
+        event: true
+      },
+    });
   }
 
   findOne(id: number) {

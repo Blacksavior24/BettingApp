@@ -14,6 +14,8 @@ import React from 'react'
 export default function HistoryPage() {
     const { bets } = useAuth()
 
+    console.log("las apuestas", bets)
+
     const getBadgeVariant = (status: Bet["status"]) => {
     switch (status) {
       case "Ganada":
@@ -28,7 +30,7 @@ export default function HistoryPage() {
 
   const categories: Array<"all" | "sport" | "esport"> = ["all", "sport", "esport"]
   const byCategory = (cat: "all" | "sport" | "esport") =>
-    bets.filter((b) => (cat === "all" ? true : b.eventDetails?.category === cat))
+    bets.filter((b) => (cat === "all" ? true : b.event?.category === cat))
 
   return (
     <ProtectedRoute>
@@ -71,17 +73,17 @@ export default function HistoryPage() {
                           <TableRow key={bet.id} className="border-b-0">
                             <TableCell className="font-medium">
                               <span className="flex items-center gap-2">
-                                {bet.eventDetails?.category === "esport" ? (
+                                {bet.event?.category === "esport" ? (
                                   <Gamepad2 className="h-4 w-4 flex-shrink-0 text-primary" />
                                 ) : (
                                   <Trophy className="h-4 w-4 flex-shrink-0 text-primary" />
                                 )}
                                 <span className="flex flex-col">
-                                  {bet.eventDetails?.category === "esport" && bet.eventDetails.game && (
-                                    <span className="block text-xs text-muted-foreground">{bet.eventDetails.game}</span>
+                                  {bet.event?.category === "esport" && bet.event.game && (
+                                    <span className="block text-xs text-muted-foreground">{bet.event.game}</span>
                                   )}
                                   <span>
-                                    {bet.eventDetails?.teamA} vs {bet.eventDetails?.teamB}
+                                    {bet.event?.teamA} vs {bet.event?.teamB}
                                   </span>
                                 </span>
                               </span>

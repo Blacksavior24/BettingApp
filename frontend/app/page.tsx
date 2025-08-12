@@ -7,7 +7,7 @@ import FiltersBar from "@/components/filters-bar";
 import ProtectedRoute from "@/components/protected-route";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { mockESportsEvents, mockEvents } from "@/lib/data";
+import { useAuth } from "@/context/auth-context";
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 
@@ -25,25 +25,31 @@ export default function Home() {
   const [query, setQuery] = useState("")
   const [minOdds, setMinOdds] = useState(1)
 
+  const { sportEvents } = useAuth()
+
   useEffect(() => {
     const t = setTimeout(() => setMounted(true), 100)
     return () => clearTimeout(t)
   }, [])
 
-  const filter = (arr: typeof mockEvents) =>
-    arr.filter((e)=>{
-      const q = query.toLowerCase().trim()
-      const teams = `${e.teamA} ${e.teamB}`.toLowerCase()
-      const game = (e.game ?? "").toLowerCase()
-      const passesQuery = !q || teams.includes(q) || game.includes(q)
-      const maxOdds = Math.max(e.oddsA, e.oddsB, e.drawOdds)
-      const passesOdds = maxOdds >= minOdds
-      return passesQuery && passesOdds
-    })
-  
+  const filter = (arr: typeof sportEvents, category?: "sport" | "esport") =>
+    arr.filter((e) => {
+      if (category && e.category !== category) return false;
 
-  const sports = useMemo(()=> filter(mockEvents), [query, minOdds])
-  const esports = useMemo(() => filter(mockESportsEvents), [query, minOdds])
+      const q = query.toLowerCase().trim();
+      const teams = `${e.teamA} ${e.teamB}`.toLowerCase();
+      const game = (e.game ?? "").toLowerCase();
+      const passesQuery = !q || teams.includes(q) || game.includes(q);
+
+      const maxOdds = Math.max(e.oddsA, e.oddsB, e.drawOdds || 0);
+      const passesOdds = maxOdds >= minOdds;
+
+      return passesQuery && passesOdds;
+    });
+
+  const sports = useMemo(() => filter(sportEvents, "sport"), [sportEvents, query, minOdds]);
+
+  const esports = useMemo(() => filter(sportEvents, "esport"), [sportEvents, query, minOdds]);
 
   return (
     <ProtectedRoute>
@@ -54,11 +60,11 @@ export default function Home() {
             <p className="text-muted-foreground">Explora y apuesta en deportes y e-sports.</p>
           </header>
 
-        <section className="mb-6">
-          <FiltersBar onSearchChange={setQuery} onMinOddsChange={setMinOdds} />
-        </section>
+          <section className="mb-6">
+            <FiltersBar onSearchChange={setQuery} onMinOddsChange={setMinOdds} />
+          </section>
 
-        <Tabs defaultValue="sports" className="w-full">
+          <Tabs defaultValue="sports" className="w-full">
             <TabsList className="grid w-full grid-cols-2 bg-secondary/50 md:w-[420px]">
               <TabsTrigger value="sports">Deportes</TabsTrigger>
               <TabsTrigger value="esports">E-Sports</TabsTrigger>

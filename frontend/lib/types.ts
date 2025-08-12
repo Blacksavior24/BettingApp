@@ -25,11 +25,6 @@ export interface Bet {
     potentialWinnings: number
     status: "Pendiente" | "Ganada" | "Perdida"
     date: string
-    eventDetails?: {
-        teamA: string
-        teamB: string
-        category: "sport" | "esport"
-        game?: string
-    }
+    event: SportEvent
 }
 

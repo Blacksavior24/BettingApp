@@ -45,7 +45,7 @@ export default function EventCard({ event }: EventCardProps) {
     return Number((parsedAmount * outcomeOdds(selected)).toFixed(2))
   }, [parsedAmount, selected])
 
-  const onConfirm = useCallback(() => {
+  const onConfirm = useCallback(async () => {
     if (!selected || parsedAmount <= 0) {
       toast({
         title: "Completa tu selección",
@@ -55,13 +55,22 @@ export default function EventCard({ event }: EventCardProps) {
       return
     }
     const label = outcomeLabel(selected)
-    placeBet(event.id, label, parsedAmount)
-    toast({
-      title: "¡Apuesta realizada!",
-      description: `Apostaste ${formatCurrency(parsedAmount)} a ${label}. Potencial: ${formatCurrency(potential)}.`,
-    })
-    setAmount("")
-    setSelected(null)
+
+    try {
+      await placeBet(event.id, label, parsedAmount)
+      toast({
+        title: "¡Apuesta realizada!",
+        description: `Apostaste ${formatCurrency(parsedAmount)} a ${label}. Potencial: ${formatCurrency(potential)}.`,
+      });
+      setAmount("");
+      setSelected(null);
+    } catch (error) {
+      toast({
+        title: "Error al realizar la apuesta",
+        description: error instanceof Error ? error.message : "Error desconocido",
+        variant: "destructive",
+      });
+    }
   }, [selected, parsedAmount, potential, event.id, placeBet, toast])
 
   const applyQuick = (delta: number, exact = false) => {
@@ -98,7 +107,7 @@ export default function EventCard({ event }: EventCardProps) {
           <section className="flex items-center justify-between gap-6">
             <span className="flex flex-col items-center gap-2 text-center">
               <Image
-                src={"/placeholder.svg?height=56&width=56&query=team+logo"}
+                src={"https://liquipedia.net/commons/images/0/00/SK_Telecom_T1_full_allmode.png"}
                 alt={`Logo ${event.teamA}`}
                 width={56}
                 height={56}
@@ -110,7 +119,7 @@ export default function EventCard({ event }: EventCardProps) {
             <span className="text-2xl font-light text-muted-foreground">VS</span>
             <span className="flex flex-col items-center gap-2 text-center">
               <Image
-                src={"/placeholder.svg?height=56&width=56&query=team+logo"}
+                src={"https://liquipedia.net/commons/images/0/00/SK_Telecom_T1_full_allmode.png"}
                 alt={`Logo ${event.teamB}`}
                 width={56}
                 height={56}
@@ -139,20 +148,19 @@ export default function EventCard({ event }: EventCardProps) {
                   key={key}
                   type="button"
                   onClick={() => setSelected((prev) => (prev === key ? null : key))}
-                  className={`group relative flex h-auto flex-col items-center gap-1 overflow-hidden rounded-lg border px-3 py-2 text-left transition-colors ${
-                    isSelected
+                  className={`group relative flex h-auto flex-col items-center gap-1 overflow-hidden rounded-lg border px-3 py-2 text-left transition-colors ${isSelected
                       ? "border-primary/70 bg-primary/10"
                       : "border-border bg-secondary/40 hover:bg-secondary/60"
-                  }`}
+                    }`}
                   whileTap={{ scale: 0.98 }}
                   aria-pressed={isSelected}
-                  aria-label={`Seleccionar ${outcomeLabel(key)} con cuota ${event.oddsA.toFixed(2)}`}
+                  aria-label={`Seleccionar ${outcomeLabel(key)} con cuota ${outcomeOdds(key).toFixed(2)}`}
                 >
                   {isSelected && (
                     <Check className="absolute right-2 top-2 h-3.5 w-3.5 text-primary opacity-90" aria-hidden="true" />
                   )}
                   <span className="leading-none text-xs text-muted-foreground">{outcomeLabel(key)}</span>
-                  <span className="leading-none text-base font-bold text-primary">{event.oddsA.toFixed(2)}</span>
+                  <span className="leading-none text-base font-bold text-primary">{outcomeOdds(key).toFixed(2)}</span>
                 </motion.button>
               )
             })}
@@ -254,8 +262,8 @@ export default function EventCard({ event }: EventCardProps) {
             >
               {selected && parsedAmount > 0
                 ? `Apostar ${formatCurrency(parsedAmount)} a ${outcomeLabel(selected)} · Ganas ${formatCurrency(
-                    potential,
-                  )}`
+                  potential,
+                )}`
                 : "Confirmar apuesta"}
             </Button>
           </motion.div>
