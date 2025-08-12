@@ -52,6 +52,8 @@ Debes ver los contenedores:
 ---
 
 ## Usuarios Demo  
+
+Recuerda ingresar al frontend en "http://localhost:3000/"
 Puedes iniciar sesión con las siguientes credenciales:  
 
 | Usuario      | Contraseña |  
