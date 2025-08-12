@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -53,5 +53,21 @@ export class UserService {
     return this.prisma.user.delete({
       where: { id },
     });
+  }
+
+  async validateUser(username: string, password: string) {
+    const user = await this.prisma.user.findUnique({ where: { username } });
+    if (!user) {
+      throw new UnauthorizedException('Usuario no encontrado');
+    }
+
+    const passwordValid = await bcrypt.compare(password, user.password);
+    if (!passwordValid) {
+      throw new UnauthorizedException('Contraseña incorrecta');
+    }
+
+    // Retorna usuario sin password
+    const { password: _, ...result } = user;
+    return result;
   }
 }
